@@ -5,8 +5,31 @@ const cors = require('cors');
 
 /*add caching and delays */
 
+
 const app = express();
 
+const nodeCache = require('node-cache');
+const cache = new nodeCache({ stdTTL: 3600 }); 
+
+app.get('/api/character/:name', async (req, res) => {
+
+
+    const { name } = req.params;
+    const cacheKey = `character_${name}`;
+    
+
+    const cachedData = cache.get(cacheKey);
+    if (cachedData) {
+        console.log(`Serving ${name} from cache`);
+        return res.json(cachedData);
+    }
+    
+    
+    cache.set(cacheKey, character);
+    res.json(character);
+
+
+});
 
 
 
@@ -36,10 +59,19 @@ app.get('/', (req, res) => {
     <head>
       <title>MLP Wiki Scraper</title>
       <style>
-        body { font-family: sans-serif; max-width: 20em; margin: auto; padding: 2em; }
+
+        body { font-family: sans-serif;
+        max-width: 20em; 
+        margin: auto; 
+        padding: 2em; }
+
         h1 { color: #6a0dad; }
-        a { color: #9b59b6; text-decoration: none; }
+
+        a { color: #9b59b6;
+        text-decoration: none;
+         }
         a:hover { text-decoration: underline; }
+
       </style>
     </head>
     <body>
